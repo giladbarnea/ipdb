@@ -16,6 +16,7 @@ from IPython import get_ipython
 from IPython.core.debugger import BdbQuit_excepthook
 from IPython.terminal.ipapp import TerminalIPythonApp
 from IPython.terminal.embed import InteractiveShellEmbed
+from IPython.terminal.debugger import TerminalPdb
 
 try:
     import configparser
@@ -50,15 +51,20 @@ debugger_cls = shell.debugger_cls
 def _init_pdb(context=None, commands=[]):
     if context is None:
         context = os.getenv("IPDB_CONTEXT_SIZE", get_context_from_config())
+    # from IPython.terminal.debugger import set_trace
+    # set_trace()
     try:
         p = debugger_cls(context=context)
     except TypeError:
         p = debugger_cls()
-    p: IPython.terminal.debugger.TerminalPdb
+    p: TerminalPdb
+    
     # Interesting:
     # p.postcmd(stop, line) # Hook method executed just after a command dispatch is finished.
     # p.preloop(): Hook method executed once when the cmdloop() method is called.
+    # commands += [f"from rich.console import Console; con = Console(); con.print_exception(show_locals=True)"]
     p.rcLines.extend(commands)
+    
     return p
 
 
@@ -78,6 +84,12 @@ def set_trace(frame=None, context=None, cond=True):
         frame = sys._getframe().f_back
     # Interesting:
     # _init_pdb(context, commands = [])
+    
+    # from rich.console import Console
+    # con = Console()
+    # con.print_exception(show_locals=True)
+    with open('./.ipdbeval.py', 'rb') as f:
+        exec(compile(f.read(), './.ipdbeval.py', 'exec'))
     p = _init_pdb(context).set_trace(frame)
     if p and hasattr(p, 'shell'):
         p.shell.restore_sys_module_state()
