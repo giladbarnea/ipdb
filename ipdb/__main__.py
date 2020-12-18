@@ -88,8 +88,13 @@ def set_trace(frame=None, context=None, cond=True):
     # from rich.console import Console
     # con = Console()
     # con.print_exception(show_locals=True)
-    with open('./.ipdbeval.py', 'rb') as f:
-        exec(compile(f.read(), './.ipdbeval.py', 'exec'))
+    try:
+        with open('./.ipdbeval.py', 'rb') as f:
+            exec(compile(f.read(), './.ipdbeval.py', 'exec'))
+    except FileNotFoundError as fnfe:
+        print(f"ipdb.set_trace(): no ./.ipdbeval.py found")
+    except Exception as e:
+        print(f"ipdb.set_trace(): {e.__class__.__qualname__} when evalulating ./.ipdbeval.py: ", *e.args)
     p = _init_pdb(context).set_trace(frame)
     if p and hasattr(p, 'shell'):
         p.shell.restore_sys_module_state()
