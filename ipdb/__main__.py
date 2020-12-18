@@ -16,11 +16,11 @@ from IPython import get_ipython
 from IPython.core.debugger import BdbQuit_excepthook
 from IPython.terminal.ipapp import TerminalIPythonApp
 from IPython.terminal.embed import InteractiveShellEmbed
+
 try:
     import configparser
 except:
     import ConfigParser as configparser
-
 
 shell = get_ipython()
 if shell is None:
@@ -34,13 +34,13 @@ if shell is None:
     shell = ipapp.shell
 else:
     # Running inside IPython
-
+    
     # Detect if embed shell or not and display a message
     if isinstance(shell, InteractiveShellEmbed):
         sys.stderr.write(
-            "\nYou are currently into an embedded ipython shell,\n"
-            "the configuration will not be loaded.\n\n"
-        )
+                "\nYou are currently into an embedded ipython shell,\n"
+                "the configuration will not be loaded.\n\n"
+                )
 
 # Let IPython decide about which debugger class to use
 # This is especially important for tools that fiddle with stdout
@@ -54,6 +54,10 @@ def _init_pdb(context=None, commands=[]):
         p = debugger_cls(context=context)
     except TypeError:
         p = debugger_cls()
+    p: IPython.terminal.debugger.TerminalPdb
+    # Interesting:
+    # p.postcmd(stop, line) # Hook method executed just after a command dispatch is finished.
+    # p.preloop(): Hook method executed once when the cmdloop() method is called.
     p.rcLines.extend(commands)
     return p
 
@@ -72,6 +76,8 @@ def set_trace(frame=None, context=None, cond=True):
     wrap_sys_excepthook()
     if frame is None:
         frame = sys._getframe().f_back
+    # Interesting:
+    # _init_pdb(context, commands = [])
     p = _init_pdb(context).set_trace(frame)
     if p and hasattr(p, 'shell'):
         p.shell.restore_sys_module_state()
@@ -86,9 +92,9 @@ def get_context_from_config():
     except ValueError:
         value = parser.get("ipdb", "context")
         raise ValueError(
-            "In %s,  context value [%s] cannot be converted into an integer."
-            % (parser.filepath, value)
-        )
+                "In %s,  context value [%s] cannot be converted into an integer."
+                % (parser.filepath, value)
+                )
 
 
 class ConfigFile(object):
@@ -97,27 +103,27 @@ class ConfigFile(object):
     file so that users don't actually have to manually add a [ipdb] section.
     Works with configparser versions from both Python 2 and 3
     """
-
+    
     def __init__(self, filepath):
         self.first = True
         with open(filepath) as f:
             self.lines = f.readlines()
-
+    
     # Python 2.7 (Older dot versions)
     def readline(self):
         try:
             return self.__next__()
         except StopIteration:
             return ''
-
+    
     # Python 2.7 (Newer dot versions)
     def next(self):
         return self.__next__()
-
+    
     # Python 3
     def __iter__(self):
         return self
-
+    
     def __next__(self):
         if self.first:
             self.first = False
@@ -136,27 +142,27 @@ def get_config():
     Returns: A ConfigParser object.
     """
     parser = configparser.ConfigParser()
-
+    
     filepaths = []
-
+    
     # Low priority goes first in the list
     for cfg_file in ("setup.cfg", ".ipdb"):
         cwd_filepath = os.path.join(os.getcwd(), cfg_file)
         if os.path.isfile(cwd_filepath):
             filepaths.append(cwd_filepath)
-
+    
     # Medium priority (whenever user wants to set a specific path to config file)
     home = os.getenv("HOME")
     if home:
         default_filepath = os.path.join(home, ".ipdb")
         if os.path.isfile(default_filepath):
             filepaths.append(default_filepath)
-
+    
     # High priority (default files)
     env_filepath = os.getenv("IPDB_CONFIG")
     if env_filepath and os.path.isfile(env_filepath):
         filepaths.append(env_filepath)
-
+    
     if filepaths:
         # Python 3 has parser.read_file(iterator) while Python2 has
         # parser.readfp(obj_with_readline)
@@ -238,18 +244,18 @@ def main():
     import traceback
     import sys
     import getopt
-
+    
     try:
         from pdb import Restart
     except ImportError:
         class Restart(Exception):
             pass
-
+    
     if sys.version_info >= (3, 7):
         opts, args = getopt.getopt(sys.argv[1:], 'mhc:', ['help', 'command='])
     else:
         opts, args = getopt.getopt(sys.argv[1:], 'hc:', ['help', 'command='])
-
+    
     commands = []
     run_as_module = False
     for opt, optarg in opts:
@@ -260,22 +266,22 @@ def main():
             commands.append(optarg)
         elif opt in ['-m']:
             run_as_module = True
-
+    
     if not args:
         print(_usage)
         sys.exit(2)
-
-    mainpyfile = args[0]     # Get script filename
+    
+    mainpyfile = args[0]  # Get script filename
     if not run_as_module and not os.path.exists(mainpyfile):
         print('Error:', mainpyfile, 'does not exist')
         sys.exit(1)
-
-    sys.argv = args     # Hide "pdb.py" from argument list
-
+    
+    sys.argv = args  # Hide "pdb.py" from argument list
+    
     # Replace pdb's dir with script's dir in front of module search path.
     if not run_as_module:
         sys.path[0] = os.path.dirname(mainpyfile)
-
+    
     # Note on saving/restoring sys.argv: it's a good idea when sys.argv was
     # modified by the script being debugged. It's a bad idea when it was
     # changed by the user from the command line. There is a "restart" command
