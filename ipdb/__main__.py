@@ -51,8 +51,7 @@ debugger_cls = shell.debugger_cls
 def _init_pdb(context=None, commands=[]):
     if context is None:
         context = os.getenv("IPDB_CONTEXT_SIZE", get_context_from_config())
-    # from IPython.terminal.debugger import set_trace
-    # set_trace()
+    
     try:
         p = debugger_cls(context=context)
     except TypeError:
@@ -85,9 +84,6 @@ def set_trace(frame=None, context=None, cond=True):
     # Interesting:
     # _init_pdb(context, commands = [])
     
-    # from rich.console import Console
-    # con = Console()
-    # con.print_exception(show_locals=True)
     try:
         with open('./.ipdbeval.py', 'rb') as f:
             exec(compile(f.read(), './.ipdbeval.py', 'exec'))
