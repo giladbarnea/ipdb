@@ -12,7 +12,7 @@ import unittest
 import os
 import tempfile
 import shutil
-from ipdb.__main__ import get_config
+from ipdb3.__main__ import get_config
 
 
 class ModifiedEnvironment(object):

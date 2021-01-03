@@ -1,45 +1,47 @@
-IPython `pdb`
-=============
+IPython `pdb` 3
+===============
+ipdb3_ is an improved version of ipdb_ that provides extra functionality and customisation.
 
-.. image:: https://travis-ci.org/gotcha/ipdb.png?branch=master
-  :target: https://travis-ci.org/gotcha/ipdb
-.. image:: https://codecov.io/gh/gotcha/ipdb/branch/master/graphs/badge.svg?style=flat
-  :target: https://codecov.io/gh/gotcha/ipdb?branch=master
+Python 2 support has been dropped to make way for new features.
 
 Use
 ---
 
-ipdb exports functions to access the IPython_ debugger, which features
+``ipdb3`` exports functions to access the IPython_ debugger, which features
 tab completion, syntax highlighting, better tracebacks, better introspection
-with the same interface as the `pdb` module.
+with the same interface as the ``pdb`` module.
 
 Example usage:
 
 .. code-block:: python
 
-        import ipdb
-        ipdb.set_trace()
-        ipdb.set_trace(context=5)  # will show five lines of code
+        import ipdb3
+        ipdb3.set_trace()
+        ipdb3.set_trace(context=5)  # will show five lines of code
                                    # instead of the default three lines
                                    # or you can set it via IPDB_CONTEXT_SIZE env variable
                                    # or setup.cfg file
-        ipdb.set_trace(pretrace='/useful/debug/tools.py')  # can be set via IPDB_PRETRACE
+        ipdb3.set_trace(pretrace='/useful/debug/tools.py')  # can be set via IPDB_PRETRACE
                                                            # env variable. pretrace also
                                                            # accepts the same type of args
-                                                           # as ipdb.run(), ipdb.runcall()
-                                                           # and ipdb.runeval()
-        ipdb.pm()
-        ipdb.run('x[0] = 3')
-        result = ipdb.runcall(function, arg0, arg1, kwarg='foo')
-        result = ipdb.runeval('f(1,2) - 3')
+                                                           # as ipdb3.run(), ipdb3.runcall()
+                                                           # and ipdb3.runeval()
+        ipdb3.pm()
+        ipdb3.run('x[0] = 3')
+        result = ipdb3.runcall(function, arg0, arg1, kwarg='foo')
+        result = ipdb3.runeval('f(1,2) - 3')
 
 
-Arguments for `set_trace`
-+++++++++++++++++++++++++
+Arguments for ``ipdb3.set_trace``
++++++++++++++++++++++++++++++++++
 
-The `set_trace` function accepts `context` which will show as many lines of code as defined;
-`cond`, which accepts boolean values (such as `abc == 17`) and will start ipdb's
-interface whenever `cond` equals to `True`; and `pretrace`, which accepts a file path, a python statement string, or a code object, which it will execute immediately before starting the debugger.
+The ``ipdb3.set_trace`` function accepts the following optional parameters:
+
+* ``frame``, a `frame` object (defaults to last);
+* ``context: int``, which will show as many lines of code as defined;
+* ``cond: bool``, which accepts boolean values (such as ``abc == 17``) and will start ipdb's interface whenever ``cond`` equals to ``True``;
+* ``pretrace``, which accepts a file path, a python statement string, or a code object, which it will execute immediately before starting the debugger.
+
 
 Using configuration file
 ++++++++++++++++++++++++
@@ -67,75 +69,54 @@ A valid .ipdb is as follows
         pretrace="import inspect"
 
 
-The post-mortem function, ``ipdb.pm()``, is equivalent to the magic function
+The post-mortem function, ``ipdb3.pm()``, is equivalent to the magic function
 ``%debug``.
 
 .. _IPython: http://ipython.org
+.. _ipdb: https://github.com/gotcha/ipdb
+.. _ipdb3: https://github.com/giladbarnea/ipdb3
 
-If you install ``ipdb`` with a tool which supports ``setuptools`` entry points,
-an ``ipdb`` script is made for you. You can use it to debug your python 2 scripts like
-
-::
-
-        $ bin/ipdb mymodule.py
-
-And for python 3
+If you install ``ipdb3`` with a tool which supports ``setuptools`` entry points,
+an ``ipdb3`` script is made for you. You can use it to debug your python scripts like
 
 ::
 
         $ bin/ipdb3 mymodule.py
 
-Alternatively with Python 2.7 only, you can also use
-
-::
-
-        $ python -m ipdb mymodule.py
-
 You can also enclose code with the ``with`` statement to launch ipdb if an exception is raised:
 
 .. code-block:: python
 
-        from ipdb import launch_ipdb_on_exception
+        from ipdb3 import launch_ipdb_on_exception
 
         with launch_ipdb_on_exception():
-            [...]
+            ...
 
-.. warning::
-   Context managers were introduced in Python 2.5.
-   Adding a context manager implies dropping Python 2.4 support.
-   Use ``ipdb==0.6`` with 2.4.
 
-.. warning::
-   Using ``from future import print_function`` for Python 3 compat implies dropping Python 2.5 support.
-   Use ``ipdb<=0.8`` with 2.5.
 
 Issues with ``stdout``
 ----------------------
 
 Some tools, like ``nose`` fiddle with ``stdout``.
 
-Until ``ipdb==0.9.4``, we tried to guess when we should also
-fiddle with ``stdout`` to support those tools.
-However, all strategies tried until 0.9.4 have proven brittle.
-
-If you use ``nose`` or another tool that fiddles with ``stdout``, you should
-explicitly ask for ``stdout`` fiddling by using ``ipdb`` like this
+If you use a tool that fiddles with ``stdout``, you should
+explicitly ask for ``stdout`` fiddling by using ``ipdb3`` like this
 
 .. code-block:: python
 
-        import ipdb
-        ipdb.sset_trace()
-        ipdb.spm()
+        import ipdb3
+        ipdb3.sset_trace()
+        ipdb3.spm()
 
-        from ipdb import slaunch_ipdb_on_exception
+        from ipdb3 import slaunch_ipdb_on_exception
         with slaunch_ipdb_on_exception():
-            [...]
+            ...
 
 
 Development
 -----------
 
-``ipdb`` source code and tracker are at https://github.com/gotcha/ipdb.
+``ipdb3`` source code and tracker are at https://github.com/giladbarnea/ipdb3.
 
 Pull requests should take care of updating the changelog ``HISTORY.txt``.
 
@@ -146,29 +127,3 @@ To test your changes, make use of ``manual_test.py``. Create a virtual environme
 install IPython and run ``python manual_test.py`` and check if your changes are in effect.
 If possible, create automated tests for better behaviour control.
 
-Third-party support
--------------------
-
-Products.PDBDebugMode
-+++++++++++++++++++++
-
-Zope2 Products.PDBDebugMode_ uses ``ipdb``, if available, in place of ``pdb``.
-
-.. _Products.PDBDebugMode: http://pypi.python.org/pypi/Products.PDBDebugMode
-
-iw.debug
-++++++++
-
-iw.debug_ allows you to trigger an ``ipdb`` debugger on any published object
-of a Zope2 application.
-
-.. _iw.debug: http://pypi.python.org/pypi/iw.debug
-
-ipdbplugin
-++++++++++
-
-ipdbplugin_ is a nose_ test runner plugin that also uses the IPython debugger
-instead of ``pdb``. (It does not depend on ``ipdb`` anymore).
-
-.. _ipdbplugin: http://pypi.python.org/pypi/ipdbplugin
-.. _nose: http://readthedocs.org/docs/nose

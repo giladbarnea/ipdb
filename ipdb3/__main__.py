@@ -1,8 +1,15 @@
 # Copyright (c) 2011-2016 Godefroid Chapelle and ipdb development team
 #
-# This file is part of ipdb.
-# Redistributable under the revised BSD license
-# https://opensource.org/licenses/BSD-3-Clause
+# This file is part of ipdb3.
+# GNU package is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 2 of the License, or (at your option)
+# any later version.
+#
+# GNU package is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
 
 
 import os
@@ -90,7 +97,7 @@ def set_trace(frame=None, context=None, cond=True, pretrace=None):
 def _exec_pretrace(pretrace=None):
     """Can handle a python file path, string representing a python statement, or a code object"""
     # todo: support executing .ipy files
-    print('ipdb _exec_pretrace(%s)'%repr(pretrace))
+    print('ipdb3 _exec_pretrace(%s)' % repr(pretrace))
     pretrace = pretrace or os.getenv("IPDB_PRETRACE", get_pretrace_from_config())
     if pretrace is None:
         return
@@ -102,7 +109,7 @@ def _exec_pretrace(pretrace=None):
             # either a string or a code object
             exec(pretrace) 
         except TypeError:
-            print('ipdb _exec_pretrace(): pretrace is not None but failed compilation and execution: ', repr(pretrace))
+            print('ipdb3 _exec_pretrace(): pretrace is not None but failed compilation and execution: ', repr(pretrace))
 
 
 def get_pretrace_from_config():
@@ -111,10 +118,10 @@ def get_pretrace_from_config():
     parser = get_config()
     try:
         pretrace = parser.get('ipdb', 'pretrace')
-        print('ipdb get_pretrace_from_config(): pretrace from %s: ' % parser.filepath, pretrace)
+        print('ipdb3 get_pretrace_from_config(): pretrace from %s: ' % parser.filepath, pretrace)
         return pretrace
     except (configparser.NoSectionError, configparser.NoOptionError):
-        print('ipdb get_pretrace_from_config(): NO pretrace from ', parser.filepath)
+        print('ipdb3 get_pretrace_from_config(): NO pretrace from ', parser.filepath)
         return None
 
 
@@ -158,7 +165,7 @@ class ConfigFile(object):
 
 def get_config():
     """
-    Get ipdb config file settings.
+    Get ipdb3 config file settings.
     All available config files are read.  If settings are in multiple configs,
     the last value encountered wins.  Values specified on the command-line take
     precedence over all config file settings.
@@ -240,7 +247,7 @@ def launch_ipdb_on_exception():
 
 
 _usage = """\
-usage: python -m ipdb [-m] [-c command] ... pyfile [arg] ...
+usage: python -m ipdb3 [-m] [-c command] ... pyfile [arg] ...
 
 Debug the Python program given by pyfile.
 
@@ -254,7 +261,7 @@ To let the script run up to a given line X in the debugged file, use
 
 Option -m is available only in Python 3.7 and later.
 
-ipdb version %s.""" % __version__
+ipdb3 version %s.""" % __version__
 
 
 def main():

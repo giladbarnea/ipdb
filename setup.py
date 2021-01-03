@@ -11,7 +11,7 @@ import io
 
 version = re.search(
     r'__version__\s*=\s*[\'"]([^\'"]*)[\'"]',  # It excludes inline comment too
-    io.open('ipdb/__main__.py', encoding='utf_8_sig').read()
+    io.open('ipdb3/__main__.py', encoding='utf_8_sig').read()
     ).group(1)
 
 long_description = (open('README.rst').read() +
@@ -19,17 +19,16 @@ long_description = (open('README.rst').read() +
 
 
 if version_info[0] == 2:
-    console_script = 'ipdb'
+    console_script = 'ipdb3'
 else:
-    console_script = 'ipdb%d' % version_info.major
+    console_script = 'ipdb3%d' % version_info.major
 
 
-setup(name='ipdb',
+setup(name='ipdb3',
       version=version,
-      description="IPython-enabled pdb",
+      description="IPython-enabled pdb with extra functionality and customisation",
       long_description=long_description,
       classifiers=[
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
@@ -42,28 +41,24 @@ setup(name='ipdb',
         'Topic :: Software Development :: Debuggers',
         'License :: OSI Approved :: BSD License',
       ],
-      keywords='pdb ipython',
-      author='Godefroid Chapelle',
-      author_email='gotcha@bubblenet.be',
-      url='https://github.com/gotcha/ipdb',
+      keywords='pdb ipython ipdb ipdb3',
+      author='Gilad Barnea',
+      author_email='giladbrn@gmail.com',
+      url='https://github.com/giladbarnea/ipdb3',
       license='BSD',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
       include_package_data=True,
       zip_safe=True,
       test_suite='tests',
-      python_requires=">=2.7",
+      python_requires=">=3.4",
       install_requires=[
-          'setuptools'
+          'IPython >= 7.0'
       ],
-      extras_require={
-          ':python_version == "2.7"': ['ipython >= 5.1.0, < 6.0.0'],
-          # No support for python 3.0, 3.1, 3.2.
-          ':python_version >= "3.4"': ['ipython >= 5.1.0'],
-      },
+      
       tests_require=[
           'mock'
       ],
       entry_points={
-          'console_scripts': ['%s = ipdb.__main__:main' % console_script]
+          'console_scripts': ['%s = ipdb3.__main__:main' % console_script]
       }
 )
