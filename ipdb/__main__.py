@@ -4,6 +4,9 @@
 # Redistributable under the revised BSD license
 # https://opensource.org/licenses/BSD-3-Clause
 
+# TODO: checkout forks:
+#  https://github.com/amitassaraf/pdbi
+#  https://github.com/kafendt/ipdb_shortcuts
 from __future__ import print_function
 import os
 import sys
@@ -16,7 +19,6 @@ from IPython import get_ipython
 from IPython.core.debugger import BdbQuit_excepthook
 from IPython.terminal.ipapp import TerminalIPythonApp
 from IPython.terminal.embed import InteractiveShellEmbed
-from IPython.terminal.debugger import TerminalPdb
 
 try:
     import configparser
@@ -56,7 +58,6 @@ def _init_pdb(context=None, pretrace=None, commands=[]):
         p = debugger_cls(context=context)
     except TypeError:
         p = debugger_cls()
-    # p: TerminalPdb
     
     # Interesting:
     # p.postcmd(stop, line) # Hook method executed just after a command dispatch is finished.
