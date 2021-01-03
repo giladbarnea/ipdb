@@ -12,11 +12,16 @@
 # for more details.
 
 from setuptools import setup, find_packages
+import re
 
-version = '1.0.1'
+with open('ipdb3/__main__.py') as mainpy:
+    match = re.search(r'__version__\s*=\s*[\'"]([^\'"]*)[\'"]',  # It excludes inline comment
+                      mainpy.read())
+    version = match.group(1)
 
-long_description = (open('README.rst').read() +
-                    '\n\n' + open('HISTORY.txt').read())
+long_description = (open('README.rst').read()
+                    # + '\n\n' + open('HISTORY.txt').read()
+                    )
 
 console_script = 'ipdb3'
 

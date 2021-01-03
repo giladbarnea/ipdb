@@ -17,7 +17,7 @@ import sys
 
 from contextlib import contextmanager
 
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 
 from IPython import get_ipython
 from IPython.core.debugger import BdbQuit_excepthook
