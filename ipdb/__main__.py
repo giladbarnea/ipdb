@@ -4,7 +4,6 @@
 # Redistributable under the revised BSD license
 # https://opensource.org/licenses/BSD-3-Clause
 
-from __future__ import print_function
 import os
 import sys
 
@@ -16,12 +15,9 @@ from IPython import get_ipython
 from IPython.core.debugger import BdbQuit_excepthook
 from IPython.terminal.ipapp import TerminalIPythonApp
 from IPython.terminal.embed import InteractiveShellEmbed
-from IPython.terminal.debugger import TerminalPdb
+from IPython.terminal.debugger import Pdb
 
-try:
-    import configparser
-except:
-    import ConfigParser as configparser
+import configparser
 
 shell = get_ipython()
 if shell is None:
@@ -48,7 +44,7 @@ else:
 debugger_cls = shell.debugger_cls
 
 
-def _init_pdb(context=None, pretrace=None, commands=[]):
+def _init_pdb(context=None, pretrace=None, commands=[])->Pdb:
     if context is None:
         context = os.getenv("IPDB_CONTEXT_SIZE", get_context_from_config())
     
@@ -56,14 +52,15 @@ def _init_pdb(context=None, pretrace=None, commands=[]):
         p = debugger_cls(context=context)
     except TypeError:
         p = debugger_cls()
-    # p: TerminalPdb
+    p: Pdb # probably TerminalPdb
     
     # Interesting:
     # p.postcmd(stop, line) # Hook method executed just after a command dispatch is finished.
     # p.preloop(): Hook method executed once when the cmdloop() method is called.
     # commands += [f"from rich.console import Console; con = Console(); con.print_exception(show_locals=True)"]
     p.rcLines.extend(commands)
-    # TODO: use p.run() | p.runcall() | p.runeval()
+    # TODO: use p.run() | p.runcall() | p.runeval().
+    #  also checkout pdb.preloop, pdb._runscript
     #  support passing e.g. `function, arg0, arg1, kwarg='foo'` ?
     _exec_pretrace(pretrace)
     return p
@@ -121,8 +118,8 @@ def get_pretrace_from_config():
 
 
 def get_context_from_config():
+    parser = get_config()
     try:
-        parser = get_config()
         return parser.getint("ipdb", "context")
     except (configparser.NoSectionError, configparser.NoOptionError):
         return 3
@@ -146,18 +143,6 @@ class ConfigFile(object):
         with open(filepath) as f:
             self.lines = f.readlines()
     
-    # Python 2.7 (Older dot versions)
-    def readline(self):
-        try:
-            return self.__next__()
-        except StopIteration:
-            return ''
-    
-    # Python 2.7 (Newer dot versions)
-    def next(self):
-        return self.__next__()
-    
-    # Python 3
     def __iter__(self):
         return self
     
@@ -201,21 +186,15 @@ def get_config():
         filepaths.append(env_filepath)
     
     if filepaths:
-        # Python 3 has parser.read_file(iterator) while Python2 has
-        # parser.readfp(obj_with_readline)
-        try:
-            read_func = parser.read_file
-        except AttributeError:
-            read_func = parser.readfp
         for filepath in filepaths:
             parser.filepath = filepath
             # Users are expected to put an [ipdb] section
             # only if they use setup.cfg
             if filepath.endswith('setup.cfg'):
                 with open(filepath) as f:
-                    read_func(f)
+                    parser.read_file(f)
             else:
-                read_func(ConfigFile(filepath))
+                parser.read_file(ConfigFile(filepath))
     return parser
 
 
@@ -278,6 +257,7 @@ ipdb version %s.""" % __version__
 
 
 def main():
+    # TODO: consider supporting -p PRETRACE cmd arg
     import traceback
     import sys
     import getopt
