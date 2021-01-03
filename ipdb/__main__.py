@@ -90,6 +90,7 @@ def set_trace(frame=None, context=None, cond=True):
 
 
 def _exec_pretrace():
+    """Can handle a python file path, string representing a python statement, or a code object"""
     print('ipdb _exec_pretrace()')
     pretrace = os.getenv("IPDB_PRETRACE", get_pretrace_from_config())
     if pretrace is None:
@@ -98,25 +99,23 @@ def _exec_pretrace():
         with open(pretrace, 'rb') as f:
             exec(compile(f.read(), pretrace, 'exec'))
     except FileNotFoundError:
-        # either a string or a code object
         try:
+            # either a string or a code object
             exec(pretrace) 
         except TypeError:
-            print('ipdb _exec_pretrace(): pretrace is not None but failed compilation and execution: ',pretrace)
+            print('ipdb _exec_pretrace(): pretrace is not None but failed compilation and execution: ', pretrace)
 
 
 def get_pretrace_from_config():
-    # todo: should convert to __code__ object
-    #  compile source arg can be Python module, statement or expression
-    #  mode arg must be 'exec' to compile a module, 'single' to compile a
-        # single (interactive) statement, or 'eval' to compile an expression.
+    """`pretrace` field can be a python file path, or string representing a python statement"""
+    # todo: support multiple statements (list of strings?)
     try:
         parser = get_config()
         pretrace = parser.get('ipdb', 'pretrace')
-        print(f'ipdb get_pretrace_from_config(): got pretrace from config: ', pretrace)
+        print('ipdb get_pretrace_from_config(): pretrace from %s: ' % parser.filepath, pretrace)
         return pretrace
     except (configparser.NoSectionError, configparser.NoOptionError):
-        print(f'ipdb get_pretrace_from_config(): NO pretrace from config')
+        print('ipdb get_pretrace_from_config(): NO pretrace from ', parser.filepath)
         return None
 
 
