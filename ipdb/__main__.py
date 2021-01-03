@@ -110,8 +110,8 @@ def _exec_pretrace(pretrace=None):
 def get_pretrace_from_config():
     """`pretrace` field can be a python file path, or string representing a python statement"""
     # todo: support multiple statements (list of strings?)
+    parser = get_config()
     try:
-        parser = get_config()
         pretrace = parser.get('ipdb', 'pretrace')
         print('ipdb get_pretrace_from_config(): pretrace from %s: ' % parser.filepath, pretrace)
         return pretrace
@@ -121,8 +121,8 @@ def get_pretrace_from_config():
 
 
 def get_context_from_config():
+    parser = get_config()
     try:
-        parser = get_config()
         return parser.getint("ipdb", "context")
     except (configparser.NoSectionError, configparser.NoOptionError):
         return 3
@@ -278,6 +278,7 @@ ipdb version %s.""" % __version__
 
 
 def main():
+    # TODO: consider supporting -p PRETRACE cmd arg
     import traceback
     import sys
     import getopt
