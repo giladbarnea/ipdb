@@ -81,19 +81,43 @@ def set_trace(frame=None, context=None, cond=True):
     wrap_sys_excepthook()
     if frame is None:
         frame = sys._getframe().f_back
-    # Interesting:
-    # _init_pdb(context, commands = [])
     
-    try:
-        with open('./.ipdbeval.py', 'rb') as f:
-            exec(compile(f.read(), './.ipdbeval.py', 'exec'))
-    except FileNotFoundError as fnfe:
-        print(f"ipdb.set_trace(): no ./.ipdbeval.py found")
-    except Exception as e:
-        print(f"ipdb.set_trace(): {e.__class__.__qualname__} when evalulating ./.ipdbeval.py: ", *e.args)
+    _exec_pretrace()
+    
     p = _init_pdb(context).set_trace(frame)
     if p and hasattr(p, 'shell'):
         p.shell.restore_sys_module_state()
+
+
+def _exec_pretrace():
+    print('ipdb _exec_pretrace()')
+    pretrace = os.getenv("IPDB_PRETRACE", get_pretrace_from_config())
+    if pretrace is None:
+        return
+    try:
+        with open(pretrace, 'rb') as f:
+            exec(compile(f.read(), pretrace, 'exec'))
+    except FileNotFoundError:
+        # either a string or a code object
+        try:
+            exec(pretrace) 
+        except TypeError:
+            print('ipdb _exec_pretrace(): pretrace is not None but failed compilation and execution: ',pretrace)
+
+
+def get_pretrace_from_config():
+    # todo: should convert to __code__ object
+    #  compile source arg can be Python module, statement or expression
+    #  mode arg must be 'exec' to compile a module, 'single' to compile a
+        # single (interactive) statement, or 'eval' to compile an expression.
+    try:
+        parser = get_config()
+        pretrace = parser.get('ipdb', 'pretrace')
+        print(f'ipdb get_pretrace_from_config(): got pretrace from config: ', pretrace)
+        return pretrace
+    except (configparser.NoSectionError, configparser.NoOptionError):
+        print(f'ipdb get_pretrace_from_config(): NO pretrace from config')
+        return None
 
 
 def get_context_from_config():
