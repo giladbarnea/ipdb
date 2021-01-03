@@ -4,7 +4,7 @@
 # Redistributable under the revised BSD license
 # https://opensource.org/licenses/BSD-3-Clause
 
-from __future__ import print_function
+
 import os
 import sys
 
