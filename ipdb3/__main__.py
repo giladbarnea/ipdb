@@ -52,7 +52,7 @@ else:
 debugger_cls = shell.debugger_cls
 
 
-def _init_pdb(context=None, pretrace=None, commands=[]) -> Pdb:
+def _init_pdb(context=None, prebreak=None, commands=[]) -> Pdb:
     if context is None:
         context = os.getenv("IPDB_CONTEXT_SIZE", get_context_from_config())
     
@@ -70,7 +70,7 @@ def _init_pdb(context=None, pretrace=None, commands=[]) -> Pdb:
     # TODO: use p.run() | p.runcall() | p.runeval().
     #  also checkout pdb.preloop, pdb._runscript
     #  support passing e.g. `function, arg0, arg1, kwarg='foo'` ?
-    _exec_pretrace(pretrace)
+    _exec_prebreak(prebreak)
     return p
 
 
@@ -86,52 +86,52 @@ def wrap_sys_breakpointhook(*set_trace_args, **set_trace_kwargs):
     if sys.breakpointhook.__module__ == 'sys':
         if set_trace_args or set_trace_kwargs:
             from functools import partial
-            set_trace_fn = partial(set_trace,*set_trace_args,**set_trace_kwargs)
+            set_trace_fn = partial(set_trace, *set_trace_args, **set_trace_kwargs)
         else:
             set_trace_fn = set_trace
         sys.breakpointhook = set_trace_fn
 
 
-def set_trace(frame=None, context=None, cond=True, pretrace=None):
+def set_trace(frame=None, context=None, cond=True, prebreak=None):
     if not cond:
         return
     wrap_sys_excepthook()
     if frame is None:
         frame = sys._getframe().f_back
         
-    p = _init_pdb(context, pretrace).set_trace(frame)
+    p = _init_pdb(context, prebreak).set_trace(frame)
     if p and hasattr(p, 'shell'):
         p.shell.restore_sys_module_state()
 
 
-def _exec_pretrace(pretrace=None):
+def _exec_prebreak(prebreak=None):
     """Can handle a python file path, string representing a python statement, or a code object"""
     # todo: support executing .ipy files
-    print('ipdb3 _exec_pretrace(%s)' % repr(pretrace))
-    pretrace = pretrace or os.getenv("IPDB_PRETRACE", get_pretrace_from_config())
-    if pretrace is None:
+    print('ipdb3 _exec_prebreak(%s)' % repr(prebreak))
+    prebreak = prebreak or os.getenv("IPDB_PREKBREAK", get_prebreak_from_config())
+    if prebreak is None:
         return
     try:
-        with open(pretrace, 'rb') as f:
-            exec(compile(f.read(), pretrace, 'exec'))
+        with open(prebreak, 'rb') as f:
+            exec(compile(f.read(), prebreak, 'exec'))
     except FileNotFoundError:
         try:
             # either a string or a code object
-            exec(pretrace) 
+            exec(prebreak)
         except TypeError:
-            print('ipdb3 _exec_pretrace(): pretrace is not None but failed compilation and execution: ', repr(pretrace))
+            print('ipdb3 _exec_prebreak(): prebreak is not None but failed compilation and execution: ', repr(prebreak))
 
 
-def get_pretrace_from_config():
-    """`pretrace` field can be a python file path, or string representing a python statement"""
+def get_prebreak_from_config():
+    """`prebreak` field can be a python file path, or string representing a python statement"""
     # todo: support multiple statements (list of strings?)
     parser = get_config()
     try:
-        pretrace = parser.get('ipdb', 'pretrace')
-        print(f'ipdb3 get_pretrace_from_config(): pretrace from {parser.filepath}: ', pretrace)
-        return pretrace
+        prebreak = parser.get('ipdb', 'prebreak')
+        print(f'ipdb3 get_prebreak_from_config(): prebreak from {parser.filepath}: ', prebreak)
+        return prebreak
     except (configparser.NoSectionError, configparser.NoOptionError):
-        print('ipdb3 get_pretrace_from_config(): NO pretrace from ', parser.filepath)
+        print('ipdb3 get_prebreak_from_config(): NO prebreak from ', parser.filepath)
         return None
 
 
@@ -272,7 +272,7 @@ ipdb3 version %s.""" % __version__
 
 
 def main():
-    # TODO: consider supporting -p PRETRACE cmd arg
+    # TODO: consider supporting -p PREBREAK cmd arg
     import traceback
     import sys
     import getopt
