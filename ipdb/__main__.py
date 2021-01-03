@@ -48,7 +48,7 @@ else:
 debugger_cls = shell.debugger_cls
 
 
-def _init_pdb(context=None, commands=[]):
+def _init_pdb(context=None, pretrace=None, commands=[]):
     if context is None:
         context = os.getenv("IPDB_CONTEXT_SIZE", get_context_from_config())
     
@@ -56,14 +56,16 @@ def _init_pdb(context=None, commands=[]):
         p = debugger_cls(context=context)
     except TypeError:
         p = debugger_cls()
-    p: TerminalPdb
+    # p: TerminalPdb
     
     # Interesting:
     # p.postcmd(stop, line) # Hook method executed just after a command dispatch is finished.
     # p.preloop(): Hook method executed once when the cmdloop() method is called.
     # commands += [f"from rich.console import Console; con = Console(); con.print_exception(show_locals=True)"]
     p.rcLines.extend(commands)
-    
+    # TODO: use p.run() | p.runcall() | p.runeval()
+    #  support passing e.g. `function, arg0, arg1, kwarg='foo'` ?
+    _exec_pretrace(pretrace)
     return p
 
 
@@ -75,24 +77,23 @@ def wrap_sys_excepthook():
         sys.excepthook = BdbQuit_excepthook
 
 
-def set_trace(frame=None, context=None, cond=True):
+def set_trace(frame=None, context=None, cond=True, pretrace=None):
     if not cond:
         return
     wrap_sys_excepthook()
     if frame is None:
         frame = sys._getframe().f_back
-    
-    _exec_pretrace()
-    
-    p = _init_pdb(context).set_trace(frame)
+        
+    p = _init_pdb(context, pretrace).set_trace(frame)
     if p and hasattr(p, 'shell'):
         p.shell.restore_sys_module_state()
 
 
-def _exec_pretrace():
+def _exec_pretrace(pretrace=None):
     """Can handle a python file path, string representing a python statement, or a code object"""
-    print('ipdb _exec_pretrace()')
-    pretrace = os.getenv("IPDB_PRETRACE", get_pretrace_from_config())
+    # todo: support executing .ipy files
+    print('ipdb _exec_pretrace(%s)'%repr(pretrace))
+    pretrace = pretrace or os.getenv("IPDB_PRETRACE", get_pretrace_from_config())
     if pretrace is None:
         return
     try:
@@ -103,7 +104,7 @@ def _exec_pretrace():
             # either a string or a code object
             exec(pretrace) 
         except TypeError:
-            print('ipdb _exec_pretrace(): pretrace is not None but failed compilation and execution: ', pretrace)
+            print('ipdb _exec_pretrace(): pretrace is not None but failed compilation and execution: ', repr(pretrace))
 
 
 def get_pretrace_from_config():

@@ -23,6 +23,11 @@ Example usage:
                                    # instead of the default three lines
                                    # or you can set it via IPDB_CONTEXT_SIZE env variable
                                    # or setup.cfg file
+        ipdb.set_trace(pretrace='/useful/debug/tools.py')  # can be set via IPDB_PRETRACE
+                                                           # env variable. pretrace also
+                                                           # accepts the same type of args
+                                                           # as ipdb.run(), ipdb.runcall()
+                                                           # and ipdb.runeval()
         ipdb.pm()
         ipdb.run('x[0] = 3')
         result = ipdb.runcall(function, arg0, arg1, kwarg='foo')
@@ -32,9 +37,9 @@ Example usage:
 Arguments for `set_trace`
 +++++++++++++++++++++++++
 
-The `set_trace` function accepts `context` which will show as many lines of code as defined,
-and `cond`, which accepts boolean values (such as `abc == 17`) and will start ipdb's
-interface whenever `cond` equals to `True`.
+The `set_trace` function accepts `context` which will show as many lines of code as defined;
+`cond`, which accepts boolean values (such as `abc == 17`) and will start ipdb's
+interface whenever `cond` equals to `True`; and `pretrace`, which accepts a file path, a python statement string, or a code object, which it will execute immediately before starting the debugger.
 
 Using configuration file
 ++++++++++++++++++++++++
@@ -51,6 +56,7 @@ A valid setup.cfg is as follows
 
         [ipdb]
         context=5
+        pretrace=./file.py
 
 
 A valid .ipdb is as follows
@@ -58,6 +64,7 @@ A valid .ipdb is as follows
 ::
 
         context=5
+        pretrace="import inspect"
 
 
 The post-mortem function, ``ipdb.pm()``, is equivalent to the magic function
