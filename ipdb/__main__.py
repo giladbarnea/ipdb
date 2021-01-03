@@ -64,7 +64,8 @@ def _init_pdb(context=None, pretrace=None, commands=[]):
     # p.preloop(): Hook method executed once when the cmdloop() method is called.
     # commands += [f"from rich.console import Console; con = Console(); con.print_exception(show_locals=True)"]
     p.rcLines.extend(commands)
-    # TODO: use p.run() | p.runcall() | p.runeval()
+    # TODO: use p.run() | p.runcall() | p.runeval().
+    #  also checkout pdb.preloop, pdb._runscript
     #  support passing e.g. `function, arg0, arg1, kwarg='foo'` ?
     _exec_pretrace(pretrace)
     return p
