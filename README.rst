@@ -32,6 +32,20 @@ Example usage:
         result = ipdb3.runeval('f(1,2) - 3')
 
 
+
+Patching ``sys.breakpointhook`` to call ``ipdb3`` when calling ``breakpoint()``:
+
+.. code-block:: python
+
+    import ipdb3
+    import sys
+    sys.breakpointhook = ipdb3.set_trace
+
+    # You can also call set_trace with default arguments, likewise:
+
+    from functools import partial
+    sys.breakpointhook = partial(ipdb3.set_trace, context=30, pretrace='/my/favourite/things.py')
+
 Arguments for ``ipdb3.set_trace``
 +++++++++++++++++++++++++++++++++
 
