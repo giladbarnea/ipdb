@@ -82,6 +82,16 @@ def wrap_sys_excepthook():
         sys.excepthook = BdbQuit_excepthook
 
 
+def wrap_sys_breakpointhook(*set_trace_args, **set_trace_kwargs):
+    if sys.breakpointhook.__module__ == 'sys':
+        if set_trace_args or set_trace_kwargs:
+            from functools import partial
+            set_trace_fn = partial(set_trace,*set_trace_args,**set_trace_kwargs)
+        else:
+            set_trace_fn = set_trace
+        sys.breakpointhook = set_trace_fn
+
+
 def set_trace(frame=None, context=None, cond=True, pretrace=None):
     if not cond:
         return
