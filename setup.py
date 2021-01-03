@@ -13,7 +13,7 @@
 
 from setuptools import setup, find_packages
 
-version = '1.0.0'
+version = '1.0.1'
 
 long_description = (open('README.rst').read() +
                     '\n\n' + open('HISTORY.txt').read())
@@ -25,9 +25,6 @@ setup(name='ipdb3',
       description="IPython-enabled pdb with extra functionality and customisation",
       long_description=long_description,
       classifiers=[
-          'Programming Language :: Python :: 3',
-          'Programming Language :: Python :: 3.4',
-          'Programming Language :: Python :: 3.5',
           'Programming Language :: Python :: 3.6',
           'Programming Language :: Python :: 3.7',
           'Programming Language :: Python :: 3.8',
@@ -46,7 +43,7 @@ setup(name='ipdb3',
       include_package_data=True,
       zip_safe=True,
       test_suite='tests',
-      python_requires=">=3.4",
+      python_requires=">=3.6",
       install_requires=[
           'IPython >= 7.0'
           ],

@@ -17,7 +17,7 @@ import sys
 
 from contextlib import contextmanager
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 
 from IPython import get_ipython
 from IPython.core.debugger import BdbQuit_excepthook
@@ -52,7 +52,7 @@ else:
 debugger_cls = shell.debugger_cls
 
 
-def _init_pdb(context=None, pretrace=None, commands=[])->Pdb:
+def _init_pdb(context=None, pretrace=None, commands=[]) -> Pdb:
     if context is None:
         context = os.getenv("IPDB_CONTEXT_SIZE", get_context_from_config())
     
@@ -60,7 +60,7 @@ def _init_pdb(context=None, pretrace=None, commands=[])->Pdb:
         p = debugger_cls(context=context)
     except TypeError:
         p = debugger_cls()
-    p: Pdb # probably TerminalPdb
+    p: Pdb  # probably TerminalPdb
     
     # Interesting:
     # p.postcmd(stop, line) # Hook method executed just after a command dispatch is finished.
@@ -118,7 +118,7 @@ def get_pretrace_from_config():
     parser = get_config()
     try:
         pretrace = parser.get('ipdb', 'pretrace')
-        print('ipdb3 get_pretrace_from_config(): pretrace from %s: ' % parser.filepath, pretrace)
+        print(f'ipdb3 get_pretrace_from_config(): pretrace from {parser.filepath}: ', pretrace)
         return pretrace
     except (configparser.NoSectionError, configparser.NoOptionError):
         print('ipdb3 get_pretrace_from_config(): NO pretrace from ', parser.filepath)
@@ -130,13 +130,10 @@ def get_context_from_config():
     try:
         return parser.getint("ipdb", "context")
     except (configparser.NoSectionError, configparser.NoOptionError):
-        return 3
+        return 10
     except ValueError:
         value = parser.get("ipdb", "context")
-        raise ValueError(
-                "In %s,  context value [%s] cannot be converted into an integer."
-                % (parser.filepath, value)
-                )
+        raise ValueError(f"In {parser.filepath},  context value [{value}] cannot be converted into an integer.")
 
 
 class ConfigFile(object):
