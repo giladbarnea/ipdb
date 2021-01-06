@@ -20,7 +20,7 @@ before_install:
   - pip install --upgrade pip setuptools
   - pip install codecov
 install:
-  # Install ipdb3, which will install the right IPython version for the current python.
+  # Install ipdbx, which will install the right IPython version for the current python.
   - pip install -e .
 script:
   - coverage run setup.py test

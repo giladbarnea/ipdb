@@ -17,3 +17,7 @@ include
 
 # pip
 pip-selfcheck.json
+
+env
+.gitignore.backup
+.idea

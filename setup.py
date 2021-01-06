@@ -1,6 +1,6 @@
 # Copyright (c) 2007-2016 Godefroid Chapelle and ipdb development team
 #
-# This file is part of ipdb3.
+# This file is part of ipdb-extended.
 # GNU package is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free
 # Software Foundation, either version 2 of the License, or (at your option)
@@ -14,7 +14,7 @@
 from setuptools import setup, find_packages
 import re
 
-with open('ipdb3/__main__.py') as mainpy:
+with open('ipdbx/__main__.py') as mainpy:
     match = re.search(r'__version__\s*=\s*[\'"]([^\'"]*)[\'"]',  # It excludes inline comment
                       mainpy.read())
     version = match.group(1)
@@ -23,9 +23,9 @@ long_description = (open('README.rst').read()
                     # + '\n\n' + open('HISTORY.txt').read()
                     )
 
-console_script = 'ipdb3'
+console_script = 'ipdbx'
 
-setup(name='ipdb3',
+setup(name='ipdbx',
       version=version,
       description="IPython-enabled pdb with extra functionality and customisation",
       long_description=long_description,
@@ -39,10 +39,10 @@ setup(name='ipdb3',
           'Topic :: Software Development :: Debuggers',
           'License :: OSI Approved :: BSD License',
           ],
-      keywords='pdb ipython ipdb ipdb3',
+      keywords='pdb ipython ipdb ipdbx ipdb-extended',
       author='Gilad Barnea',
       author_email='giladbrn@gmail.com',
-      url='https://github.com/giladbarnea/ipdb3',
+      url='https://github.com/giladbarnea/ipdbx',
       license='BSD',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
       include_package_data=True,
@@ -57,6 +57,6 @@ setup(name='ipdb3',
           'mock'
           ],
       entry_points={
-          'console_scripts': ['%s = ipdb3.__main__:main' % console_script]
+          'console_scripts': ['%s = ipdbx.__main__:main' % console_script]
           }
       )

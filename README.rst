@@ -1,13 +1,13 @@
 IPython `pdb` 3
 ===============
-ipdb3_ is an improved version of ipdb_ that provides extra functionality and customisation.
+ipdbx_ is an improved version of ipdb_ that provides extra functionality and customisation.
 
 Python 2 support has been dropped to make way for new features.
 
 Use
 ---
 
-``ipdb3`` exports functions to access the IPython_ debugger, which features
+``ipdbx`` exports functions to access the IPython_ debugger, which features
 tab completion, syntax highlighting, better tracebacks, better introspection
 with the same interface as the ``pdb`` module.
 
@@ -15,41 +15,41 @@ Example usage:
 
 .. code-block:: python
 
-        import ipdb3
-        ipdb3.set_trace()
-        ipdb3.set_trace(context=5)  # will show five lines of code
+        import ipdbx
+        ipdbx.set_trace()
+        ipdbx.set_trace(context=5)  # will show five lines of code
                                    # instead of the default three lines
                                    # or you can set it via IPDB_CONTEXT_SIZE env variable
                                    # or setup.cfg file
-        ipdb3.set_trace(pretrace='/useful/debug/tools.py')  # can be set via IPDB_PRETRACE
+        ipdbx.set_trace(pretrace='/useful/debug/tools.py')  # can be set via IPDB_PRETRACE
                                                            # env variable. pretrace also
                                                            # accepts the same type of args
-                                                           # as ipdb3.run(), ipdb3.runcall()
-                                                           # and ipdb3.runeval()
-        ipdb3.pm()
-        ipdb3.run('x[0] = 3')
-        result = ipdb3.runcall(function, arg0, arg1, kwarg='foo')
-        result = ipdb3.runeval('f(1,2) - 3')
+                                                           # as ipdbx.run(), ipdbx.runcall()
+                                                           # and ipdbx.runeval()
+        ipdbx.pm()
+        ipdbx.run('x[0] = 3')
+        result = ipdbx.runcall(function, arg0, arg1, kwarg='foo')
+        result = ipdbx.runeval('f(1,2) - 3')
 
 
 
-Patching ``sys.breakpointhook`` to call ``ipdb3`` when calling ``breakpoint()``:
+Patching ``sys.breakpointhook`` to call ``ipdbx`` when calling ``breakpoint()``:
 
 .. code-block:: python
 
-    import ipdb3
+    import ipdbx
     import sys
-    sys.breakpointhook = ipdb3.set_trace
+    sys.breakpointhook = ipdbx.set_trace
 
     # You can also call set_trace with default arguments, likewise:
 
     from functools import partial
-    sys.breakpointhook = partial(ipdb3.set_trace, context=30, pretrace='/my/favourite/things.py')
+    sys.breakpointhook = partial(ipdbx.set_trace, context=30, pretrace='/my/favourite/things.py')
 
-Arguments for ``ipdb3.set_trace``
+Arguments for ``ipdbx.set_trace``
 +++++++++++++++++++++++++++++++++
 
-The ``ipdb3.set_trace`` function accepts the following optional parameters:
+The ``ipdbx.set_trace`` function accepts the following optional parameters:
 
 * ``frame``, a `frame` object (defaults to last);
 * ``context: int``, which will show as many lines of code as defined;
@@ -83,25 +83,25 @@ A valid .ipdb is as follows
         pretrace="import inspect"
 
 
-The post-mortem function, ``ipdb3.pm()``, is equivalent to the magic function
+The post-mortem function, ``ipdbx.pm()``, is equivalent to the magic function
 ``%debug``.
 
 .. _IPython: http://ipython.org
 .. _ipdb: https://github.com/gotcha/ipdb
-.. _ipdb3: https://github.com/giladbarnea/ipdb3
+.. _ipdbx: https://github.com/giladbarnea/ipdbx
 
-If you install ``ipdb3`` with a tool which supports ``setuptools`` entry points,
-an ``ipdb3`` script is made for you. You can use it to debug your python scripts like
+If you install ``ipdbx`` with a tool which supports ``setuptools`` entry points,
+an ``ipdbx`` script is made for you. You can use it to debug your python scripts like
 
 ::
 
-        $ bin/ipdb3 mymodule.py
+        $ bin/ipdbx mymodule.py
 
 You can also enclose code with the ``with`` statement to launch ipdb if an exception is raised:
 
 .. code-block:: python
 
-        from ipdb3 import launch_ipdb_on_exception
+        from ipdbx import launch_ipdb_on_exception
 
         with launch_ipdb_on_exception():
             ...
@@ -114,15 +114,15 @@ Issues with ``stdout``
 Some tools, like ``nose`` fiddle with ``stdout``.
 
 If you use a tool that fiddles with ``stdout``, you should
-explicitly ask for ``stdout`` fiddling by using ``ipdb3`` like this
+explicitly ask for ``stdout`` fiddling by using ``ipdbx`` like this
 
 .. code-block:: python
 
-        import ipdb3
-        ipdb3.sset_trace()
-        ipdb3.spm()
+        import ipdbx
+        ipdbx.sset_trace()
+        ipdbx.spm()
 
-        from ipdb3 import slaunch_ipdb_on_exception
+        from ipdbx import slaunch_ipdb_on_exception
         with slaunch_ipdb_on_exception():
             ...
 
@@ -130,7 +130,7 @@ explicitly ask for ``stdout`` fiddling by using ``ipdb3`` like this
 Development
 -----------
 
-``ipdb3`` source code and tracker are at https://github.com/giladbarnea/ipdb3.
+``ipdbx`` source code and tracker are at https://github.com/giladbarnea/ipdbx.
 
 Pull requests should take care of updating the changelog ``HISTORY.txt``.
 

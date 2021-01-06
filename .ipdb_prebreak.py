@@ -1,4 +1,4 @@
-"""This file is evalulated just before ipdb3.set_trace() is called (ipdb fork)"""
+"""This file is evalulated just before ipdbx.set_trace() is called (ipdb fork)"""
 print(f'in ipdb prebreak file')
 import builtins
 import sys

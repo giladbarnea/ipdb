@@ -1,6 +1,6 @@
 # Copyright (c) 2011-2016 Godefroid Chapelle and ipdb development team
 #
-# This file is part of ipdb3.
+# This file is part of ipdb-extended.
 # GNU package is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free
 # Software Foundation, either version 2 of the License, or (at your option)
@@ -107,7 +107,7 @@ def set_trace(frame=None, context=None, cond=True, prebreak=None):
 def _exec_prebreak(prebreak=None):
     """Can handle a python file path, string representing a python statement, or a code object"""
     # todo: support executing .ipy files
-    print('ipdb3 _exec_prebreak(%s)' % repr(prebreak))
+    print('ipdbx _exec_prebreak(%s)' % repr(prebreak))
     prebreak = prebreak or os.getenv("IPDB_PREBREAK", get_prebreak_from_config())
     if prebreak is None:
         return
@@ -119,7 +119,7 @@ def _exec_prebreak(prebreak=None):
             # either a string or a code object
             exec(prebreak)
         except TypeError:
-            print('ipdb3 _exec_prebreak(): prebreak is not None but failed compilation and execution: ', repr(prebreak))
+            print('ipdbx _exec_prebreak(): prebreak is not None but failed compilation and execution: ', repr(prebreak))
 
 
 def get_prebreak_from_config():
@@ -128,10 +128,10 @@ def get_prebreak_from_config():
     parser = get_config()
     try:
         prebreak = parser.get('ipdb', 'prebreak')
-        print(f'ipdb3 get_prebreak_from_config(): prebreak from {parser.filepath}: ', prebreak)
+        print(f'ipdbx get_prebreak_from_config(): prebreak from {parser.filepath}: ', prebreak)
         return prebreak
     except (configparser.NoSectionError, configparser.NoOptionError):
-        print('ipdb3 get_prebreak_from_config(): NO prebreak from ', parser.filepath)
+        print('ipdbx get_prebreak_from_config(): NO prebreak from ', parser.filepath)
         return None
 
 
@@ -172,7 +172,7 @@ class ConfigFile(object):
 
 def get_config():
     """
-    Get ipdb3 config file settings.
+    Get ipdbx config file settings.
     All available config files are read.  If settings are in multiple configs,
     the last value encountered wins.  Values specified on the command-line take
     precedence over all config file settings.
@@ -254,7 +254,7 @@ def launch_ipdb_on_exception():
 
 
 _usage = """\
-usage: python -m ipdb3 [-m] [-c COMMAND] [-h, --help] [-V, --version] [-p, --prebreak PREBREAK] pyfile [arg] ...
+usage: python -m ipdbx [-m] [-c COMMAND] [-h, --help] [-V, --version] [-p, --prebreak PREBREAK] pyfile [arg] ...
 
 Debug the Python program given by pyfile.
 
@@ -268,7 +268,7 @@ To let the script run up to a given line X in the debugged file, use
 
 Option -m is available only in Python 3.7 and later.
 
-ipdb3 version %s.""" % __version__
+ipdbx version %s.""" % __version__
 
 
 def main():
@@ -300,7 +300,7 @@ def main():
         elif opt in ['-p', '--prebreak']:
             prebreak = optarg
         elif opt in ['-V', '--version']:
-            print(f"ipdb3 version: {__version__}")
+            print(f"ipdbx version: {__version__}")
             sys.exit()
         elif opt in ['-m']:
             run_as_module = True

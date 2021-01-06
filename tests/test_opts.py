@@ -11,30 +11,30 @@ except ImportError:
     from mock import patch
 
 from getopt import GetoptError
-from ipdb3.__main__ import main
+from ipdbx.__main__ import main
 
 
-@patch('ipdb3.__main__.debugger_cls')
+@patch('ipdbx.__main__.debugger_cls')
 class OptsTest(unittest.TestCase):
     def set_argv(self, *argv):
-        argv_patch = patch('ipdb3.__main__.sys.argv', argv)
+        argv_patch = patch('ipdbx.__main__.sys.argv', argv)
         argv_patch.start()
         self.addCleanup(argv_patch.stop)
 
-    @patch('ipdb3.__main__.sys.version_info', (3, 7))
+    @patch('ipdbx.__main__.sys.version_info', (3, 7))
     def test_debug_module_script(self, debugger_cls):
         module_name = 'my_buggy_module'
-        self.set_argv('ipdb3', '-m', module_name)
+        self.set_argv('ipdbx', '-m', module_name)
 
         main()
 
         debugger = debugger_cls.return_value
         debugger._runmodule.assert_called_once_with(module_name)
 
-    @patch('ipdb3.__main__.os.path.exists')
+    @patch('ipdbx.__main__.os.path.exists')
     def test_debug_script(self, exists, debugger_cls):
         script_name = 'my_buggy_script'
-        self.set_argv('ipdb3', script_name)
+        self.set_argv('ipdbx', script_name)
 
         main()
 
@@ -42,13 +42,13 @@ class OptsTest(unittest.TestCase):
         debugger._runscript.assert_called_once_with(script_name)
 
     def test_option_m_fallback_on_py36(self, debugger_cls):
-        self.set_argv('ipdb3', '-m', 'my.module')
-        with patch('ipdb3.__main__.sys.version_info', (3, 6)):
+        self.set_argv('ipdbx', '-m', 'my.module')
+        with patch('ipdbx.__main__.sys.version_info', (3, 6)):
             with self.assertRaises(GetoptError):
                 main()
 
-        with patch('ipdb3.__main__.sys.version_info', (3, 7)):
-            self.set_argv('ipdb3', '-m', 'my.module')
+        with patch('ipdbx.__main__.sys.version_info', (3, 7)):
+            self.set_argv('ipdbx', '-m', 'my.module')
             try:
                 main()
             except GetoptError:
