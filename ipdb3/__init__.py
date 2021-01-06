@@ -5,6 +5,7 @@
 # https://opensource.org/licenses/BSD-3-Clause
 
 from ipdb3.__main__ import set_trace, post_mortem, pm, run             # noqa
+from ipdb3.__main__ import wrap_sys_breakpointhook                 # noqa
 from ipdb3.__main__ import runcall, runeval, launch_ipdb_on_exception  # noqa
 
 from ipdb3.stdout import sset_trace, spost_mortem, spm                 # noqa

@@ -98,7 +98,7 @@ def set_trace(frame=None, context=None, cond=True, prebreak=None):
     wrap_sys_excepthook()
     if frame is None:
         frame = sys._getframe().f_back
-        
+    
     p = _init_pdb(context, prebreak).set_trace(frame)
     if p and hasattr(p, 'shell'):
         p.shell.restore_sys_module_state()
@@ -108,7 +108,7 @@ def _exec_prebreak(prebreak=None):
     """Can handle a python file path, string representing a python statement, or a code object"""
     # todo: support executing .ipy files
     print('ipdb3 _exec_prebreak(%s)' % repr(prebreak))
-    prebreak = prebreak or os.getenv("IPDB_PREKBREAK", get_prebreak_from_config())
+    prebreak = prebreak or os.getenv("IPDB_PREBREAK", get_prebreak_from_config())
     if prebreak is None:
         return
     try:
@@ -254,7 +254,7 @@ def launch_ipdb_on_exception():
 
 
 _usage = """\
-usage: python -m ipdb3 [-m] [-c command] ... pyfile [arg] ...
+usage: python -m ipdb3 [-m] [-c COMMAND] [-h, --help] [-V, --version] [-p, --prebreak PREBREAK] pyfile [arg] ...
 
 Debug the Python program given by pyfile.
 
@@ -272,7 +272,6 @@ ipdb3 version %s.""" % __version__
 
 
 def main():
-    # TODO: consider supporting -p PREBREAK cmd arg
     import traceback
     import sys
     import getopt
@@ -284,18 +283,25 @@ def main():
             pass
     
     if sys.version_info >= (3, 7):
-        opts, args = getopt.getopt(sys.argv[1:], 'mhc:', ['help', 'command='])
+        opts, args = getopt.getopt(sys.argv[1:], 'mhVp:c:', ['help', 'version', 'prebreak=', 'command='])
     else:
-        opts, args = getopt.getopt(sys.argv[1:], 'hc:', ['help', 'command='])
+        opts, args = getopt.getopt(sys.argv[1:], 'hVp:c:', ['help', 'version', 'prebreak=', 'command='])
     
     commands = []
+    prebreak = None
     run_as_module = False
     for opt, optarg in opts:
         if opt in ['-h', '--help']:
             print(_usage)
             sys.exit()
         elif opt in ['-c', '--command']:
+            breakpoint()
             commands.append(optarg)
+        elif opt in ['-p', '--prebreak']:
+            prebreak = optarg
+        elif opt in ['-V', '--version']:
+            print(f"ipdb3 version: {__version__}")
+            sys.exit()
         elif opt in ['-m']:
             run_as_module = True
     
@@ -318,7 +324,7 @@ def main():
     # modified by the script being debugged. It's a bad idea when it was
     # changed by the user from the command line. There is a "restart" command
     # which allows explicit specification of command line arguments.
-    pdb = _init_pdb(commands=commands)
+    pdb = _init_pdb(prebreak=prebreak, commands=commands)
     while 1:
         try:
             if run_as_module:
