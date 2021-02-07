@@ -131,7 +131,7 @@ def get_prebreak_from_config():
         print(f'ipdbx get_prebreak_from_config(): prebreak from {parser.filepath}: ', prebreak)
         return prebreak
     except (configparser.NoSectionError, configparser.NoOptionError):
-        print('ipdbx get_prebreak_from_config(): NO prebreak from ', parser.filepath)
+        print('ipdbx get_prebreak_from_config(): NO prebreak from ', getattr(parser, 'filepath', None))
         return None
 
 
