@@ -56,6 +56,7 @@ setup(name='ipdbx',
       tests_require=[
           'mock'
           ],
+      extras_require = {'dev':['twine']},
       entry_points={
           'console_scripts': ['%s = ipdbx.__main__:main' % console_script]
           }

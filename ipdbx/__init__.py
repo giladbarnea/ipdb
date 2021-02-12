@@ -5,7 +5,7 @@
 # https://opensource.org/licenses/BSD-3-Clause
 
 from ipdbx.__main__ import set_trace, post_mortem, pm, run             # noqa
-from ipdbx.__main__ import wrap_sys_breakpointhook                 # noqa
+from ipdbx.__main__ import wrap_sys_breakpointhook,unwrap_sys_breakpointhook # noqa
 from ipdbx.__main__ import runcall, runeval, launch_ipdb_on_exception  # noqa
 
 from ipdbx.stdout import sset_trace, spost_mortem, spm                 # noqa
