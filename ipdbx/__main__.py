@@ -17,7 +17,7 @@ import sys
 
 from contextlib import contextmanager
 
-__version__ = '1.0.4'
+__version__ = '1.0.5'
 
 from IPython import get_ipython
 from IPython.core.debugger import BdbQuit_excepthook
@@ -84,12 +84,27 @@ def wrap_sys_excepthook():
 
 def wrap_sys_breakpointhook(*set_trace_args, **set_trace_kwargs):
     if sys.breakpointhook.__module__ == 'sys':
+        
         if set_trace_args or set_trace_kwargs:
             from functools import partial
             set_trace_fn = partial(set_trace, *set_trace_args, **set_trace_kwargs)
         else:
             set_trace_fn = set_trace
         sys.breakpointhook = set_trace_fn
+        print('wrapped sys.breakpointhook')
+    else:
+        print(f'sys.breakpointhook already patched: {sys.breakpointhook}')
+
+
+def unwrap_sys_breakpointhook():
+    if sys.breakpointhook.__module__ == 'sys':
+        print(f'sys.breakpointhook already reset: {sys.breakpointhook}')
+        return
+    if sys.__breakpointhook__.__module__ != 'sys':
+        print('ERROR | ipdbx.unwrap_sys_breakpointhook() | "backup" sys.__breakpointhook__ is itself patched. Cannot unwrap.')
+        return
+    sys.breakpointhook = sys.__breakpointhook__
+    print('reset sys.breakpointhook')
 
 
 def set_trace(frame=None, context=None, cond=True, prebreak=None):
@@ -108,6 +123,9 @@ def _exec_prebreak(prebreak=None):
     """Can handle a python file path, string representing a python statement, or a code object"""
     # todo: support executing .ipy files
     print('ipdbx _exec_prebreak(%s)' % repr(prebreak))
+    if prebreak is False:
+        # prebreak=False means explicitly not to run prebreak
+        return
     prebreak = prebreak or os.getenv("IPDB_PREBREAK", get_prebreak_from_config())
     if prebreak is None:
         return
@@ -126,11 +144,12 @@ def get_prebreak_from_config():
     """`prebreak` field can be a python file path, or string representing a python statement"""
     # todo: support multiple statements (list of strings?)
     parser = get_config()
+    
     try:
         prebreak = parser.get('ipdb', 'prebreak')
         print(f'ipdbx get_prebreak_from_config(): prebreak from {parser.filepath}: ', prebreak)
         return prebreak
-    except (configparser.NoSectionError, configparser.NoOptionError):
+    except (configparser.NoSectionError, configparser.NoOptionError) as e:
         print('ipdbx get_prebreak_from_config(): NO prebreak from ', getattr(parser, 'filepath', None))
         return None
 
@@ -170,7 +189,7 @@ class ConfigFile(object):
         raise StopIteration
 
 
-def get_config():
+def get_config() -> configparser.ConfigParser:
     """
     Get ipdbx config file settings.
     All available config files are read.  If settings are in multiple configs,
@@ -262,6 +281,20 @@ Initial commands are read from .pdbrc files in your home directory
 and in the current directory, if they exist.  Commands supplied with
 -c are executed after commands from .pdbrc files.
 
+Looks for config files in the following order (last overruns first):
+ - cwd:         'setup.cfg', '.ipdb'
+ - $HOME:       '.ipdb'
+ - $IPDB_CONFIG
+ 
+Config files support the following fields:
+ - context (number)
+ - prebreak
+
+Supported env vars:
+- IPDB_CONFIG
+- IPDB_CONTEXT_SIZE
+- IPDB_PREBREAK
+
 To let the script run until an exception occurs, use "-c continue".
 To let the script run up to a given line X in the debugged file, use
 "-c 'until X'"
@@ -275,6 +308,11 @@ def main():
     import traceback
     import sys
     import getopt
+    import os
+    
+    import logging
+    logger = logging.Logger("root", level=logging.DEBUG)
+    logger.debug(f"ipdbx | main({', '.join(sys.argv[1:])})")
     
     try:
         from pdb import Restart
