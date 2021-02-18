@@ -1,0 +1,5 @@
+- [ ] integrate numb's friend's features
+- [ ] support `engine = pudb` in config
+  - [ ] should this be a `pudb` fork?
+- [ ] `rich`
+  - [ ] pretty printer (blocked: ipython rich pretty printer from config)
