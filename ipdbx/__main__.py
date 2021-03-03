@@ -54,7 +54,7 @@ debugger_cls = shell.debugger_cls
 
 def _init_pdb(context=None, prebreak=None, commands=[]) -> Pdb:
     if context is None:
-        context = os.getenv("IPDB_CONTEXT_SIZE", get_context_from_config())
+        context = os.getenv("IPDBX_CONTEXT_SIZE", get_context_from_config())
     
     try:
         p = debugger_cls(context=context)
@@ -126,7 +126,7 @@ def _exec_prebreak(prebreak=None):
     if prebreak is False:
         # prebreak=False means explicitly not to run prebreak
         return
-    prebreak = prebreak or os.getenv("IPDB_PREBREAK", get_prebreak_from_config())
+    prebreak = prebreak or os.getenv("IPDBX_PREBREAK", get_prebreak_from_config())
     if prebreak is None:
         return
     try:
@@ -146,29 +146,29 @@ def get_prebreak_from_config():
     parser = get_config()
     
     try:
-        prebreak = parser.get('ipdb', 'prebreak')
-        print(f'ipdbx get_prebreak_from_config(): prebreak from {parser.filepath}: ', prebreak)
+        prebreak = parser.get('ipdbx', 'prebreak')
+        print(f"ipdbx get_prebreak_from_config(): prebreak from {getattr(parser, 'filepath', parser)}: ", prebreak)
         return prebreak
     except (configparser.NoSectionError, configparser.NoOptionError) as e:
-        print('ipdbx get_prebreak_from_config(): NO prebreak from ', getattr(parser, 'filepath', None))
+        print('ipdbx get_prebreak_from_config(): NO prebreak from ', getattr(parser, 'filepath', parser))
         return None
 
 
 def get_context_from_config():
     parser = get_config()
     try:
-        return parser.getint("ipdb", "context")
+        return parser.getint("tool.ipdbx", "context")
     except (configparser.NoSectionError, configparser.NoOptionError):
         return 10
     except ValueError:
-        value = parser.get("ipdb", "context")
-        raise ValueError(f"In {parser.filepath},  context value [{value}] cannot be converted into an integer.")
+        value = parser.get("tool.ipdbx", "context")
+        raise ValueError(f"In {getattr(parser,'filepath',parser)},  context value [{value}] cannot be converted into an integer.")
 
 
 class ConfigFile(object):
     """
-    Filehandle wrapper that adds a "[ipdb]" section to the start of a config
-    file so that users don't actually have to manually add a [ipdb] section.
+    Filehandle wrapper that adds a "[ipdbx]" section to the start of a config
+    file so that users don't actually have to manually add a [ipdbx] section.
     Works with configparser versions from both Python 2 and 3
     """
     
@@ -183,7 +183,7 @@ class ConfigFile(object):
     def __next__(self):
         if self.first:
             self.first = False
-            return "[ipdb]\n"
+            return "[ipdbx]\n"
         if self.lines:
             return self.lines.pop(0)
         raise StopIteration
@@ -202,7 +202,7 @@ def get_config() -> configparser.ConfigParser:
     filepaths = []
     
     # Low priority goes first in the list
-    for cfg_file in ("setup.cfg", ".ipdb"):
+    for cfg_file in ("setup.cfg", ".ipdbx", "pyproject.toml"):
         cwd_filepath = os.path.join(os.getcwd(), cfg_file)
         if os.path.isfile(cwd_filepath):
             filepaths.append(cwd_filepath)
@@ -210,24 +210,26 @@ def get_config() -> configparser.ConfigParser:
     # Medium priority (whenever user wants to set a specific path to config file)
     home = os.getenv("HOME")
     if home:
-        default_filepath = os.path.join(home, ".ipdb")
+        default_filepath = os.path.join(home, ".ipdbx")
         if os.path.isfile(default_filepath):
             filepaths.append(default_filepath)
     
     # High priority (default files)
-    env_filepath = os.getenv("IPDB_CONFIG")
+    env_filepath = os.getenv("IPDBX_CONFIG")
     if env_filepath and os.path.isfile(env_filepath):
         filepaths.append(env_filepath)
     
     if filepaths:
         for filepath in filepaths:
             parser.filepath = filepath
-            # Users are expected to put an [ipdb] section
+            # Users are expected to put an [ipdbx] section
             # only if they use setup.cfg
-            if filepath.endswith('setup.cfg'):
+            if filepath.endswith('setup.cfg') or filepath.endswith('pyproject.toml'):
                 with open(filepath) as f:
+                    parser.remove_section("ipdbx")
                     parser.read_file(f)
             else:
+                parser.remove_section("tool.ipdbx")
                 parser.read_file(ConfigFile(filepath))
     return parser
 
@@ -282,18 +284,18 @@ and in the current directory, if they exist.  Commands supplied with
 -c are executed after commands from .pdbrc files.
 
 Looks for config files in the following order (last overruns first):
- - cwd:         'setup.cfg', '.ipdb'
- - $HOME:       '.ipdb'
- - $IPDB_CONFIG
+ - cwd:         'setup.cfg', '.ipdbx'
+ - $HOME:       '.ipdbx'
+ - $IPDBX_CONFIG
  
 Config files support the following fields:
  - context (number)
  - prebreak
 
 Supported env vars:
-- IPDB_CONFIG
-- IPDB_CONTEXT_SIZE
-- IPDB_PREBREAK
+- IPDBX_CONFIG
+- IPDBX_CONTEXT_SIZE
+- IPDBX_PREBREAK
 
 To let the script run until an exception occurs, use "-c continue".
 To let the script run up to a given line X in the debugged file, use

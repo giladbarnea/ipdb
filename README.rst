@@ -19,9 +19,9 @@ Example usage:
         ipdbx.set_trace()
         ipdbx.set_trace(context=5)  # will show five lines of code
                                    # instead of the default three lines
-                                   # or you can set it via IPDB_CONTEXT_SIZE env variable
+                                   # or you can set it via IPDBX_CONTEXT_SIZE env variable
                                    # or setup.cfg file
-        ipdbx.set_trace(pretrace='/useful/debug/tools.py')  # can be set via IPDB_PRETRACE
+        ipdbx.set_trace(pretrace='/useful/debug/tools.py')  # can be set via IPDBX_PRETRACE
                                                            # env variable. pretrace also
                                                            # accepts the same type of args
                                                            # as ipdbx.run(), ipdbx.runcall()
@@ -60,11 +60,11 @@ The ``ipdbx.set_trace`` function accepts the following optional parameters:
 Using configuration file
 ++++++++++++++++++++++++
 
-It's possible to set up context using a `.ipdb` file on your home folder or `setup.cfg`
-on your project folder. You can also set your file location via env var `$IPDB_CONFIG`.
-Your environment variable has priority over the home configuration file,
-which in turn has priority over the setup config file. Currently, only context setting
-is available.
+It's possible to set up context using a `.ipdb` file on your home folder, `setup.cfg`
+or `pyproject.toml` on your project folder. You can also set your file location via
+env var `$IPDBX_CONFIG`. Your environment variable has priority over the home
+configuration file, which in turn has priority over the setup config file.
+Currently, only context setting is available.
 
 A valid setup.cfg is as follows
 
@@ -81,6 +81,14 @@ A valid .ipdb is as follows
 
         context=5
         pretrace="import inspect"
+
+
+A valid pyproject.toml is as follows
+
+::
+
+        [tool.ipdb]
+        context=5
 
 
 The post-mortem function, ``ipdbx.pm()``, is equivalent to the magic function
@@ -134,6 +142,8 @@ Development
 
 Pull requests should take care of updating the changelog ``HISTORY.txt``.
 
+Under the unreleased section, add your changes and your username.
+
 Manual testing
 ++++++++++++++
 
@@ -141,3 +151,35 @@ To test your changes, make use of ``manual_test.py``. Create a virtual environme
 install IPython and run ``python manual_test.py`` and check if your changes are in effect.
 If possible, create automated tests for better behaviour control.
 
+Automated testing
++++++++++++++++++
+
+To run automated tests locally, create a virtual environment, install `coverage`
+and run `coverage run setup.py test`.
+
+Third-party support
+-------------------
+
+Products.PDBDebugMode
++++++++++++++++++++++
+
+Zope2 Products.PDBDebugMode_ uses ``ipdb``, if available, in place of ``pdb``.
+
+.. _Products.PDBDebugMode: http://pypi.python.org/pypi/Products.PDBDebugMode
+
+iw.debug
+++++++++
+
+iw.debug_ allows you to trigger an ``ipdb`` debugger on any published object
+of a Zope2 application.
+
+.. _iw.debug: http://pypi.python.org/pypi/iw.debug
+
+ipdbplugin
+++++++++++
+
+ipdbplugin_ is a nose_ test runner plugin that also uses the IPython debugger
+instead of ``pdb``. (It does not depend on ``ipdb`` anymore).
+
+.. _ipdbplugin: http://pypi.python.org/pypi/ipdbplugin
+.. _nose: http://readthedocs.org/docs/nose
